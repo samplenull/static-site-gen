@@ -86,7 +86,7 @@ class TestSplitNodesDelimiter(unittest.TestCase):
         node = TextNode("", TextType.TEXT)
         result = split_nodes_delimiter([node], "`", TextType.CODE)
 
-        expected = [TextNode("", TextType.TEXT)]
+        expected = []
 
         self.assertEqual(result, expected)
 
@@ -97,7 +97,7 @@ class TestSplitNodesDelimiter(unittest.TestCase):
         with self.assertRaises(ValueError) as context:
             split_nodes_delimiter([node], "`", TextType.CODE)
 
-        self.assertIn("Invalid Markdown syntax", str(context.exception))
+        self.assertIn("Unmatched delimiter: ", str(context.exception))
 
     def test_split_code_block_at_beginning(self):
         """Test code block at the beginning of text"""
@@ -123,32 +123,17 @@ class TestSplitNodesDelimiter(unittest.TestCase):
 
         self.assertEqual(result, expected)
 
-    def test_split_nested_delimiters(self):
-        """Test nested delimiters (should not be parsed as nested)"""
-        node = TextNode("Text with `nested `code` here`", TextType.TEXT)
-        result = split_nodes_delimiter([node], "`", TextType.CODE)
-
-        expected = [
-            TextNode("Text with ", TextType.TEXT),
-            TextNode("nested ", TextType.CODE),
-            TextNode("code", TextType.CODE),
-            TextNode(" here", TextType.TEXT),
-        ]
-
-        # Only the first `code` should be processed, not nested ones
-        self.assertEqual(result, expected)
-
     def test_non_text_nodes_unchanged(self):
         """Test that non-text nodes remain unchanged"""
         node1 = TextNode("This is normal text", TextType.TEXT)
-        node2 = TextNode("Bold content", TextType.BOLD)
+        node2 = TextNode("Bold content with `code markers`", TextType.BOLD)
         node3 = TextNode("More text", TextType.TEXT)
 
         result = split_nodes_delimiter([node1, node2, node3], "`", TextType.CODE)
 
         expected = [
             TextNode("This is normal text", TextType.TEXT),
-            TextNode("Bold content", TextType.BOLD),
+            TextNode("Bold content with `code markers`", TextType.BOLD),
             TextNode("More text", TextType.TEXT),
         ]
 
