@@ -71,7 +71,3 @@ class TestTextNode(unittest.TestCase):
             html_node.props,
             {"src": "https://www.example.com/image.jpg", "alt": "This is an image"},
         )
-
-
-if __name__ == "__main__":
-    unittest.main()
